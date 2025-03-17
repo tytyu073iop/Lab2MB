@@ -23,7 +23,7 @@ def chebyshow(a,b,n):
     base2 = (b - a)/2
     x = base
     for i in range(0,n):
-        ks = (math.cos((2*i+1) / (2 * (n))))
+        ks = (math.cos((2*i+1) * math.pi / (2 * (n))))
         points.append(base+base2*ks)
     return points
 
@@ -38,11 +38,17 @@ b = 3
 ns = (3, 10, 20)
 fs = [f1, f2]
 
+limit = True
+
 for j in range(0, len(fs)):
     fig, aArr2D = plt.subplots(len(ns), 2)
     for i in range(0, len(ns)):
         aArr2D[i][0].set_title("P:" + str(j + 1) + "," + str(ns[i]))
         aArr2D[i][1].set_title("C:" + str(j + 1) + "," + str(ns[i]))
+
+        if limit:
+            aArr2D[i][0].set_ylim(0, 10)
+            aArr2D[i][1].set_ylim(0, 10)
 
         xs2D = [ePoints(a,b,ns[i]), chebyshow(a,b,ns[i])]
         for x in range(0, len(xs2D)):
@@ -54,11 +60,19 @@ for j in range(0, len(fs)):
             nfoxs = []
             for w in range(0, 100):
                 nxs.append(a + w*(b-a)/100)
-                nfxs.append(newton(table, nxs[w]))
+                var = newton(table, nxs[w])
+
+                diff = abs(var - fs[j](nxs[w]))
+                if diff > maxpog:
+                    maxpog = diff
+
+                nfxs.append(var)
                 nfoxs.append(fs[j](nxs[w]))
         
             aArr2D[i][x].plot(nxs, nfxs, label="interpolated")
             aArr2D[i][x].plot(nxs, nfoxs, label="origin")
+
+            print(f"max pog of {"P" if x == 0 else "C"},{j+1},{ns[i]} is {maxpog}")
 
             aArr2D[i][x].legend()
 
