@@ -2,6 +2,7 @@ from table import makeTable
 from newton import newton
 import math
 import matplotlib.pyplot as plt
+from tabulate import tabulate
 
 def ePoints(a,b,n):
     points = [a]
@@ -35,22 +36,26 @@ def f2(x):
 
 a = -3
 b = 3
-ns = (3, 10, 20)
+ns = (4, 11, 21)
 fs = [f1, f2]
 
 limit = True
 
+tabulate_arr1 = []
+tabulate_arr2 = []
+
 for j in range(0, len(fs)):
     fig, aArr2D = plt.subplots(len(ns), 2)
     for i in range(0, len(ns)):
-        aArr2D[i][0].set_title("P:" + str(j + 1) + "," + str(ns[i]))
-        aArr2D[i][1].set_title("C:" + str(j + 1) + "," + str(ns[i]))
+        aArr2D[i][0].set_title("P:" + str(j + 1) + "," + str(ns[i] - 1))
+        aArr2D[i][1].set_title("C:" + str(j + 1) + "," + str(ns[i] - 1))
 
         if limit:
             aArr2D[i][0].set_ylim(0, 10)
             aArr2D[i][1].set_ylim(0, 10)
 
         xs2D = [ePoints(a,b,ns[i]), chebyshow(a,b,ns[i])]
+        maxp = [0, 0]
         for x in range(0, len(xs2D)):
             fxs = funcToList(xs2D[x], fs[j])
             table = makeTable(xs2D[x], fxs)
@@ -72,8 +77,17 @@ for j in range(0, len(fs)):
             aArr2D[i][x].plot(nxs, nfxs, label="interpolated")
             aArr2D[i][x].plot(nxs, nfoxs, label="origin")
 
-            print(f"max pog of {"P" if x == 0 else "C"},{j+1},{ns[i]} is {maxpog}")
+            # print(f"max pog of {"P" if x == 0 else "C"},{j+1},{ns[i] - 1} is {maxpog}")
+            maxp[x] = maxpog
 
             aArr2D[i][x].legend()
+
+        if (j == 0):
+            tabulate_arr1.append([ns[i] - 1, maxp[0], maxp[1]])
+        else:
+            tabulate_arr2.append([ns[i] - 1, maxp[0], maxp[1]])
+
+print(tabulate(tabulate_arr1, headers=["n", "max pog of P1", "max pog of C1"], tablefmt="simple_grid"))
+print(tabulate(tabulate_arr2, headers=["n", "max pog of P1", "max pog of C1"], tablefmt="simple_grid"))
 
 plt.show()
